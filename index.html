@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceVerse - Discord & Teams Style Video/Voice Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                        },
+                        dark: {
+                            bg: '#09090b',
+                            sidebar: '#121215',
+                            card: '#18181b',
+                            hover: '#27272a',
+                            border: '#27272a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ef4444;
+        }
+        .mirror {
+            transform: scaleX(-1);
+        }
+        .speaking-glow {
+            box-shadow: 0 0 0 3px #22c55e, 0 0 15px rgba(34, 197, 94, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-gray-100 h-full flex flex-col font-sans overflow-hidden antialiased select-none">
+
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- SERVER SIDEBAR (LEFTMOST DISCORD STYLE ICONS) -->
+        <aside class="w-16 bg-black border-r border-dark-border flex flex-col items-center py-3 space-y-3 shrink-0 z-20">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-600 to-red-900 flex items-center justify-center shadow-lg shadow-brand-600/30 cursor-pointer hover:rounded-xl transition-all">
+                <i data-lucide="flame" class="w-6 h-6 text-white"></i>
+            </div>
+            <div class="w-8 h-[2px] bg-dark-border rounded-full"></div>
+            <div class="w-12 h-12 rounded-3xl bg-dark-card hover:bg-brand-600 hover:rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-all cursor-pointer group relative">
+                <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+                <span class="absolute left-16 bg-black text-xs font-semibold px-2 py-1 rounded shadow-lg border border-dark-border opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50">Comunidade Dev</span>
+            </div>
+            <div class="w-12 h-12 rounded-3xl bg-dark-card hover:bg-brand-600 hover:rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-all cursor-pointer group relative">
+                <i data-lucide="headphones" class="w-5 h-5"></i>
+                <span class="absolute left-16 bg-black text-xs font-semibold px-2 py-1 rounded shadow-lg border border-dark-border opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50">Lounge Musical</span>
+            </div>
+        </aside>
+
+        <!-- CHANNELS SIDEBAR -->
+        <aside class="w-64 bg-dark-sidebar border-r border-dark-border flex flex-col shrink-0">
+            <!-- Server Header -->
+            <div class="h-14 px-4 border-b border-dark-border flex items-center justify-between font-bold text-sm text-gray-100 shadow-sm">
+                <span class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-brand-500"></span>
+                    Dev & Gaming Lounge
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+            </div>
+
+            <!-- Channels List -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-4">
+                
+                <!-- Category: Voice & Video -->
+                <div>
+                    <div class="flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-2">
+                        <span class="flex items-center gap-1"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Canais de Voz/Vídeo</span>
+                        <span class="text-[10px] bg-dark-hover px-1.5 py-0.5 rounded text-gray-400">4</span>
+                    </div>
+                    
+                    <div id="voice-channels-list" class="space-y-1">
+                        <!-- Channels injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Category: Text Chat -->
+                <div>
+                    <div class="flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-2">
+                        <span class="flex items-center gap-1"><i data-lucide="hash" class="w-3.5 h-3.5"></i> Canais de Texto</span>
+                    </div>
+                    <div id="text-channels-list" class="space-y-1">
+                        <!-- Text channels injected by JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- USER FOOTER -->
+            <div class="h-16 border-t border-dark-border bg-dark-card/60 px-3 flex items-center justify-between">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                    <div class="relative shrink-0">
+                        <div id="user-avatar" class="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center font-bold text-sm text-white border border-brand-500">
+                            U
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-dark-card"></span>
+                    </div>
+                    <div class="truncate">
+                        <div id="user-display-name" class="text-xs font-bold text-gray-200 truncate">Usuário</div>
+                        <div class="text-[10px] text-gray-400 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex items-center space-x-1 text-gray-400">
+                    <button id="quick-toggle-mic" class="p-1.5 hover:bg-dark-hover hover:text-white rounded-lg transition">
+                        <i data-lucide="mic" id="quick-mic-icon" class="w-4 h-4"></i>
+                    </button>
+                    <button id="quick-toggle-cam" class="p-1.5 hover:bg-dark-hover hover:text-white rounded-lg transition">
+                        <i data-lucide="video" id="quick-cam-icon" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN STAGE AREA -->
+        <div class="flex-1 flex flex-col bg-dark-bg relative overflow-hidden">
+            
+            <!-- TOP BAR -->
+            <header class="h-14 border-b border-dark-border bg-dark-sidebar/80 backdrop-blur px-6 flex items-center justify-between shrink-0 z-10">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="volume-2" class="w-5 h-5 text-brand-500"></i>
+                    <h2 id="active-channel-title" class="font-bold text-sm text-white">Geral</h2>
+                    <span id="active-channel-badge" class="text-xs px-2 py-0.5 rounded-full bg-dark-hover border border-dark-border text-gray-400">0 conectados</span>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <!-- Simulate Multi-User Bot -->
+                    <button id="btn-add-simulated-user" class="px-3 py-1.5 bg-dark-card hover:bg-dark-hover border border-dark-border text-xs font-semibold rounded-lg text-gray-300 hover:text-white transition flex items-center gap-1.5">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5 text-brand-500"></i>
+                        <span>+ Bot Simulação</span>
+                    </button>
+
+                    <!-- Toggle Chat Panel -->
+                    <button id="btn-toggle-text-chat" class="p-2 bg-dark-card hover:bg-dark-hover border border-dark-border rounded-lg text-gray-300 hover:text-white transition relative">
+                        <i data-lucide="message-square" class="w-4 h-4"></i>
+                        <span id="chat-unread-badge" class="hidden absolute top-1 right-1 w-2 h-2 rounded-full bg-brand-500"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- CONTENT BODY (VIDEO GRID & CHAT) -->
+            <div class="flex-1 flex overflow-hidden relative">
+                
+                <!-- VIDEO STAGE GRID -->
+                <main id="video-stage-container" class="flex-1 p-4 overflow-y-auto flex flex-col justify-center items-center">
+                    
+                    <!-- Dynamic Grid -->
+                    <div id="video-grid" class="w-full h-full max-h-full grid gap-4 items-center justify-center p-2 transition-all">
+                        <!-- Video cards will be injected dynamically -->
+                    </div>
+
+                    <!-- Stage Empty State -->
+                    <div id="empty-stage-placeholder" class="hidden flex-col items-center justify-center text-center p-8 border border-dashed border-dark-border rounded-2xl max-w-md">
+                        <div class="w-16 h-16 rounded-full bg-dark-card flex items-center justify-center text-brand-500 mb-3">
+                            <i data-lucide="headphones" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-200 text-base mb-1">Você está sozinho no canal</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed mb-4">
+                            Abra esta mesma página em outra aba para testar o WebRTC em tempo real ou clique em <strong>"+ Bot Simulação"</strong> para testar a grade com participantes adicionais!
+                        </p>
+                    </div>
+                </main>
+
+                <!-- SIDE TEXT CHAT PANEL -->
+                <aside id="text-chat-panel" class="w-80 bg-dark-sidebar border-l border-dark-border flex flex-col h-full transform transition-transform duration-300 shrink-0">
+                    <div class="p-3 border-b border-dark-border flex items-center justify-between">
+                        <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+                            <i data-lucide="message-square" class="w-4 h-4 text-brand-500"></i>
+                            Chat do Canal
+                        </span>
+                        <button id="btn-close-chat-panel" class="p-1 hover:bg-dark-hover rounded text-gray-400">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Chat Messages List -->
+                    <div id="chat-messages-container" class="flex-1 p-3 overflow-y-auto space-y-3">
+                        <div class="text-center my-2">
+                            <span class="text-[10px] bg-dark-hover text-gray-400 px-2.5 py-1 rounded-full border border-dark-border">
+                                Bem-vindo ao chat do canal
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <form id="chat-input-form" class="p-3 border-t border-dark-border bg-dark-card">
+                        <div class="flex items-center gap-2">
+                            <input id="chat-input-field" type="text" placeholder="Conversar na sala..." autocomplete="off" class="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500 transition">
+                            <button type="submit" class="p-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl transition shrink-0">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </form>
+                </aside>
+            </div>
+
+            <!-- FLOATING CONTROL BAR (DESKTOP/MOBILE) -->
+            <div class="h-20 bg-dark-sidebar/90 backdrop-blur border-t border-dark-border px-6 flex items-center justify-center shrink-0 z-20">
+                <div class="bg-dark-card border border-dark-border px-5 py-2.5 rounded-2xl flex items-center space-x-3 shadow-2xl">
+                    
+                    <!-- Mute Mic -->
+                    <button id="btn-control-mic" class="p-3 rounded-xl bg-dark-hover hover:bg-dark-border text-white transition active:scale-95 border border-dark-border relative group">
+                        <i data-lucide="mic" id="icon-mic" class="w-5 h-5"></i>
+                        <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">Microfone</span>
+                    </button>
+
+                    <!-- Camera Toggle -->
+                    <button id="btn-control-cam" class="p-3 rounded-xl bg-dark-hover hover:bg-dark-border text-white transition active:scale-95 border border-dark-border relative group">
+                        <i data-lucide="video" id="icon-cam" class="w-5 h-5"></i>
+                        <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">Câmera</span>
+                    </button>
+
+                    <!-- Screen Share -->
+                    <button id="btn-control-screen" class="p-3 rounded-xl bg-dark-hover hover:bg-dark-border text-white transition active:scale-95 border border-dark-border relative group">
+                        <i data-lucide="monitor" id="icon-screen" class="w-5 h-5"></i>
+                        <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">Compartilhar Tela</span>
+                    </button>
+
+                    <div class="w-px h-6 bg-dark-border"></div>
+
+                    <!-- Disconnect / Leave Channel -->
+                    <button id="btn-control-disconnect" class="p-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white transition active:scale-95 shadow-lg shadow-brand-600/30 relative group">
+                        <i data-lucide="phone-off" class="w-5 h-5"></i>
+                        <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">Sair do Canal</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TOAST CONTAINERS -->
+    <div id="toast-notifications" class="fixed bottom-24 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Unique Tab/User ID Generator
+        const myUserId = 'user_' + Math.random().toString(36).substring(2, 7);
+        const myUserName = 'Dev_' + Math.floor(100 + Math.random() * 900);
+
+        // Update User Interface Profile
+        document.getElementById('user-display-name').innerText = myUserName;
+        document.getElementById('user-avatar').innerText = myUserName.substring(4);
+
+        // Application State
+        const channels = [
+            { id: 'geral', name: 'Geral', icon: 'volume-2' },
+            { id: 'desenvolvimento', name: 'Desenvolvimento', icon: 'code' },
+            { id: 'gaming', name: 'Gaming Lounge', icon: 'gamepad-2' },
+            { id: 'reuniao-1', name: 'Reunião 1', icon: 'briefcase' },
+        ];
+
+        let activeChannelId = 'geral';
+        let localStream = null;
+        let screenStream = null;
+        
+        let isMicMuted = false;
+        let isCamOff = false;
+        let isSharingScreen = false;
+        let isChatOpen = true;
+
+        // Peer connections map: { userId: RTCPeerConnection }
+        const peerConnections = {};
+        // Connected Participants state: { userId: { name, channelId, isMuted, isCamOff, isScreenShare, isSimulated, stream } }
+        const participants = {};
+
+        // Cross-tab Broadcast Channel for Signaling without backend
+        const signalingChannel = new BroadcastChannel('voiceverse_signaling');
+
+        // DOM References
+        const voiceChannelsList = document.getElementById('voice-channels-list');
+        const textChannelsList = document.getElementById('text-channels-list');
+        const activeChannelTitle = document.getElementById('active-channel-title');
+        const activeChannelBadge = document.getElementById('active-channel-badge');
+        const videoGrid = document.getElementById('video-grid');
+        const emptyStagePlaceholder = document.getElementById('empty-stage-placeholder');
+        
+        const btnControlMic = document.getElementById('btn-control-mic');
+        const btnControlCam = document.getElementById('btn-control-cam');
+        const btnControlScreen = document.getElementById('btn-control-screen');
+        const btnControlDisconnect = document.getElementById('btn-control-disconnect');
+        const quickToggleMic = document.getElementById('quick-toggle-mic');
+        const quickToggleCam = document.getElementById('quick-toggle-cam');
+
+        const textChatPanel = document.getElementById('text-chat-panel');
+        const btnToggleTextChat = document.getElementById('btn-toggle-text-chat');
+        const btnCloseChatPanel = document.getElementById('btn-close-chat-panel');
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        const chatInputForm = document.getElementById('chat-input-form');
+        const chatInputField = document.getElementById('chat-input-field');
+        const chatUnreadBadge = document.getElementById('chat-unread-badge');
+        const btnAddSimulatedUser = document.getElementById('btn-add-simulated-user');
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-notifications');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-3.5 py-2 rounded-xl border text-xs font-medium shadow-xl flex items-center gap-2 transition-all duration-300 transform translate-y-2 opacity-0 ${
+                type === 'error' ? 'bg-red-950/90 border-red-800 text-red-200' :
+                type === 'success' ? 'bg-emerald-950/90 border-emerald-800 text-emerald-200' :
+                'bg-dark-card border-dark-border text-gray-200'
+            }`;
+            toast.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : type === 'success' ? 'check-circle-2' : 'info'}" class="w-4 h-4 text-brand-500"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize Media Stream
+        async function setupLocalMedia() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: { width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                showToast('Mídia de áudio e vídeo inicializada.', 'success');
+            } catch (err) {
+                console.warn('Câmera/Microfone não acessíveis, iniciando modo silencioso/fallback:', err);
+                showToast('Câmera ou microfone não detectados.', 'error');
+                isCamOff = true;
+                isMicMuted = true;
+                updateMediaControlsUI();
+            }
+
+            // Add self to local state
+            participants[myUserId] = {
+                id: myUserId,
+                name: myUserName + ' (Você)',
+                channelId: activeChannelId,
+                isMuted: isMicMuted,
+                isCamOff: isCamOff,
+                isScreenShare: false,
+                isSimulated: false,
+                stream: localStream
+            };
+
+            renderChannelsSidebar();
+            renderVideoGrid();
+            broadcastPresence();
+        }
+
+        // Broadcast Presence across tabs
+        function broadcastPresence() {
+            signalingChannel.postMessage({
+                type: 'presence',
+                userId: myUserId,
+                userName: myUserName,
+                channelId: activeChannelId,
+                isMuted: isMicMuted,
+                isCamOff: isCamOff,
+                isScreenShare: isSharingScreen
+            });
+        }
+
+        // Signaling Message Listener
+        signalingChannel.onmessage = async (event) => {
+            const data = event.data;
+            if (data.userId === myUserId) return; // Ignore own messages
+
+            switch (data.type) {
+                case 'presence':
+                    // Store or update remote peer status
+                    const wasInChannel = participants[data.userId]?.channelId;
+                    participants[data.userId] = {
+                        id: data.userId,
+                        name: data.userName,
+                        channelId: data.channelId,
+                        isMuted: data.isMuted,
+                        isCamOff: data.isCamOff,
+                        isScreenShare: data.isScreenShare,
+                        isSimulated: false,
+                        stream: participants[data.userId]?.stream || null
+                    };
+
+                    renderChannelsSidebar();
+                    renderVideoGrid();
+
+                    // Initiate WebRTC offer if both are in same channel and peer is new
+                    if (data.channelId === activeChannelId && !peerConnections[data.userId]) {
+                        initiateWebRTCOffer(data.userId);
+                    }
+                    break;
+
+                case 'leave':
+                    delete participants[data.userId];
+                    closePeerConnection(data.userId);
+                    renderChannelsSidebar();
+                    renderVideoGrid();
+                    break;
+
+                case 'offer':
+                    if (data.targetId === myUserId && data.channelId === activeChannelId) {
+                        await handleWebRTCOffer(data.senderId, data.offer);
+                    }
+                    break;
+
+                case 'answer':
+                    if (data.targetId === myUserId) {
+                        await handleWebRTCAnswer(data.senderId, data.answer);
+                    }
+                    break;
+
+                case 'candidate':
+                    if (data.targetId === myUserId && peerConnections[data.senderId]) {
+                        try {
+                            await peerConnections[data.senderId].addIceCandidate(new RTCIceCandidate(data.candidate));
+                        } catch (e) {
+                            console.error('Erro ao adicionar ICE candidate:', e);
+                        }
+                    }
+                    break;
+
+                case 'chat':
+                    if (data.channelId === activeChannelId) {
+                        appendChatMessage(data.userName, data.message, 'remote');
+                        if (!isChatOpen) {
+                            chatUnreadBadge.classList.remove('hidden');
+                        }
+                    }
+                    break;
+            }
+        };
+
+        // WebRTC Connection Setup
+        function createPeerConnection(remoteUserId) {
+            const pc = new RTCPeerConnection({
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+            });
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+            }
+
+            pc.onicecandidate = (e) => {
+                if (e.candidate) {
+                    signalingChannel.postMessage({
+                        type: 'candidate',
+                        senderId: myUserId,
+                        targetId: remoteUserId,
+                        candidate: e.candidate
+                    });
+                }
+            };
+
+            pc.ontrack = (e) => {
+                if (participants[remoteUserId]) {
+                    participants[remoteUserId].stream = e.streams[0];
+                    renderVideoGrid();
+                }
+            };
+
+            peerConnections[remoteUserId] = pc;
+            return pc;
+        }
+
+        async function initiateWebRTCOffer(remoteUserId) {
+            const pc = createPeerConnection(remoteUserId);
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            signalingChannel.postMessage({
+                type: 'offer',
+                senderId: myUserId,
+                targetId: remoteUserId,
+                channelId: activeChannelId,
+                offer: offer
+            });
+        }
+
+        async function handleWebRTCOffer(senderId, offer) {
+            const pc = createPeerConnection(senderId);
+            await pc.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            signalingChannel.postMessage({
+                type: 'answer',
+                senderId: myUserId,
+                targetId: senderId,
+                answer: answer
+            });
+        }
+
+        async function handleWebRTCAnswer(senderId, answer) {
+            const pc = peerConnections[senderId];
+            if (pc) {
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+            }
+        }
+
+        function closePeerConnection(userId) {
+            if (peerConnections[userId]) {
+                peerConnections[userId].close();
+                delete peerConnections[userId];
+            }
+        }
+
+        // Render Sidebar Channels with Voice Members
+        function renderChannelsSidebar() {
+            voiceChannelsList.innerHTML = '';
+            textChannelsList.innerHTML = '';
+
+            channels.forEach(ch => {
+                const isSelected = ch.id === activeChannelId;
+                const membersInChannel = Object.values(participants).filter(p => p.channelId === ch.id);
+
+                // Voice Channel Element
+                const chEl = document.createElement('div');
+                chEl.className = `group rounded-lg transition overflow-hidden ${isSelected ? 'bg-dark-hover text-white' : 'text-gray-400 hover:bg-dark-hover/50 hover:text-gray-200'}`;
+                
+                chEl.innerHTML = `
+                    <button onclick="switchChannel('${ch.id}')" class="w-full px-2.5 py-2 flex items-center justify-between text-xs font-medium">
+                        <span class="flex items-center gap-2 truncate">
+                            <i data-lucide="${ch.icon}" class="w-4 h-4 ${isSelected ? 'text-brand-500' : 'text-gray-400'}"></i>
+                            <span class="truncate">${ch.name}</span>
+                        </span>
+                        ${membersInChannel.length > 0 ? `<span class="text-[10px] px-1.5 py-0.2 bg-dark-card border border-dark-border rounded-full text-gray-300 font-bold">${membersInChannel.length}</span>` : ''}
+                    </button>
+                    ${membersInChannel.length > 0 ? `
+                        <div class="px-3 pb-2 space-y-1">
+                            ${membersInChannel.map(m => `
+                                <div class="flex items-center justify-between text-[11px] text-gray-300 py-0.5 px-2 rounded hover:bg-dark-card">
+                                    <span class="flex items-center gap-1.5 truncate">
+                                        <span class="w-1.5 h-1.5 rounded-full ${m.isMuted ? 'bg-yellow-500' : 'bg-emerald-500'}"></span>
+                                        <span class="truncate">${m.name}</span>
+                                    </span>
+                                    <div class="flex items-center gap-1 text-gray-500">
+                                        ${m.isMuted ? '<i data-lucide="mic-off" class="w-3 h-3 text-red-400"></i>' : ''}
+                                        ${m.isScreenShare ? '<i data-lucide="monitor" class="w-3 h-3 text-brand-500 animate-pulse"></i>' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+                voiceChannelsList.appendChild(chEl);
+
+                // Text Channel Element
+                const txtEl = document.createElement('button');
+                txtEl.onclick = () => switchChannel(ch.id);
+                txtEl.className = `w-full px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 ${isSelected ? 'bg-dark-hover text-white font-medium' : 'text-gray-400 hover:bg-dark-hover/50 hover:text-gray-200'}`;
+                txtEl.innerHTML = `<i data-lucide="hash" class="w-3.5 h-3.5"></i> <span>chat-${ch.id}</span>`;
+                textChannelsList.appendChild(txtEl);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Dynamic Video Stage Grid Calculation
+        function renderVideoGrid() {
+            videoGrid.innerHTML = '';
+            const currentMembers = Object.values(participants).filter(p => p.channelId === activeChannelId);
+
+            activeChannelBadge.innerText = `${currentMembers.length} conectado${currentMembers.length !== 1 ? 's' : ''}`;
+
+            if (currentMembers.length === 0) {
+                emptyStagePlaceholder.classList.remove('hidden');
+                emptyStagePlaceholder.classList.add('flex');
+                videoGrid.className = 'hidden';
+                return;
+            } else {
+                emptyStagePlaceholder.classList.add('hidden');
+                emptyStagePlaceholder.classList.remove('flex');
+                videoGrid.className = 'w-full h-full max-h-full grid gap-4 items-center justify-center transition-all';
+            }
+
+            // Calculate grid dimensions dynamically
+            const count = currentMembers.length;
+            if (count === 1) {
+                videoGrid.classList.add('grid-cols-1', 'max-w-3xl');
+            } else if (count === 2) {
+                videoGrid.classList.add('grid-cols-1', 'md:grid-cols-2', 'max-w-5xl');
+            } else if (count <= 4) {
+                videoGrid.classList.add('grid-cols-2', 'max-w-5xl');
+            } else if (count <= 6) {
+                videoGrid.classList.add('grid-cols-2', 'md:grid-cols-3', 'max-w-6xl');
+            } else {
+                videoGrid.classList.add('grid-cols-3', 'md:grid-cols-4', 'max-w-7xl');
+            }
+
+            currentMembers.forEach(member => {
+                const isMe = member.id === myUserId;
+                const card = document.createElement('div');
+                card.className = `relative w-full h-full min-h-[200px] max-h-[60vh] bg-dark-card border border-dark-border rounded-2xl overflow-hidden flex items-center justify-center group shadow-xl transition-all ${!member.isMuted ? 'speaking-glow' : ''}`;
+
+                card.innerHTML = `
+                    <video id="video-${member.id}" autoplay playsinline ${isMe ? 'muted' : ''} class="w-full h-full object-cover ${isMe && !isSharingScreen ? 'mirror' : ''} ${member.isCamOff ? 'hidden' : ''}"></video>
+                    
+                    <!-- Fallback Avatar when camera is off -->
+                    <div class="avatar-fallback ${member.isCamOff ? 'flex' : 'hidden'} absolute inset-0 flex-col items-center justify-center bg-dark-card">
+                        <div class="w-20 h-20 rounded-full bg-dark-hover border-2 border-brand-600 flex items-center justify-center text-xl font-bold text-gray-200 mb-2 shadow-inner">
+                            ${member.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <span class="text-xs text-gray-400">Câmera Desativada</span>
+                    </div>
+
+                    <!-- Overlay Top Badge -->
+                    <div class="absolute top-3 left-3 flex items-center gap-2 bg-black/60 backdrop-blur px-2.5 py-1 rounded-lg border border-white/10 text-xs font-medium text-white">
+                        <span class="w-2 h-2 rounded-full ${member.isMuted ? 'bg-yellow-500' : 'bg-emerald-500'}"></span>
+                        <span class="truncate max-w-[120px]">${member.name}</span>
+                    </div>
+
+                    <!-- Mic Status Indicator -->
+                    <div class="absolute top-3 right-3 bg-black/60 backdrop-blur p-1.5 rounded-lg border border-white/10 text-white">
+                        <i data-lucide="${member.isMuted ? 'mic-off' : 'mic'}" class="w-3.5 h-3.5 ${member.isMuted ? 'text-red-400' : 'text-emerald-400'}"></i>
+                    </div>
+
+                    ${member.isScreenShare ? `
+                        <div class="absolute bottom-3 left-3 bg-brand-600/90 backdrop-blur px-2.5 py-1 rounded-md text-[10px] font-semibold text-white flex items-center gap-1 animate-pulse">
+                            <i data-lucide="monitor" class="w-3 h-3"></i> Transmitindo Tela
+                        </div>
+                    ` : ''}
+                `;
+
+                videoGrid.appendChild(card);
+
+                const videoEl = card.querySelector(`#video-${member.id}`);
+                if (isMe) {
+                    if (localStream) videoEl.srcObject = isSharingScreen ? screenStream : localStream;
+                } else if (member.stream) {
+                    videoEl.srcObject = member.stream;
+                }
+            });
+
+            lucide.createIcons();
+        }
+
+        // Switch Active Channel
+        function switchChannel(channelId) {
+            if (activeChannelId === channelId) return;
+
+            activeChannelId = channelId;
+            const channelObj = channels.find(c => c.id === channelId);
+            activeChannelTitle.innerText = channelObj ? channelObj.name : channelId;
+
+            // Update user state
+            if (participants[myUserId]) {
+                participants[myUserId].channelId = activeChannelId;
+            }
+
+            // Close existing WebRTC connections on channel switch
+            Object.keys(peerConnections).forEach(id => closePeerConnection(id));
+
+            renderChannelsSidebar();
+            renderVideoGrid();
+            broadcastPresence();
+
+            // Clear chat messages for new channel
+            chatMessagesContainer.innerHTML = `
+                <div class="text-center my-2">
+                    <span class="text-[10px] bg-dark-hover text-gray-400 px-2.5 py-1 rounded-full border border-dark-border">
+                        Conectado ao chat do canal #${channelObj ? channelObj.name : channelId}
+                    </span>
+                </div>
+            `;
+
+            showToast(`Conectado ao canal ${channelObj ? channelObj.name : channelId}`, 'info');
+        }
+
+        // Controls Event Listeners
+        btnControlMic.addEventListener('click', toggleMicrophone);
+        quickToggleMic.addEventListener('click', toggleMicrophone);
+
+        function toggleMicrophone() {
+            if (!localStream) return;
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                isMicMuted = !isMicMuted;
+                audioTrack.enabled = !isMicMuted;
+                if (participants[myUserId]) participants[myUserId].isMuted = isMicMuted;
+                
+                updateMediaControlsUI();
+                broadcastPresence();
+                renderVideoGrid();
+                renderChannelsSidebar();
+                showToast(isMicMuted ? 'Microfone mutado' : 'Microfone ativado');
+            }
+        }
+
+        btnControlCam.addEventListener('click', toggleCamera);
+        quickToggleCam.addEventListener('click', toggleCamera);
+
+        function toggleCamera() {
+            if (!localStream) return;
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                isCamOff = !isCamOff;
+                videoTrack.enabled = !isCamOff;
+                if (participants[myUserId]) participants[myUserId].isCamOff = isCamOff;
+
+                updateMediaControlsUI();
+                broadcastPresence();
+                renderVideoGrid();
+                showToast(isCamOff ? 'Câmera desligada' : 'Câmera ligada');
+            }
+        }
+
+        // Screen Share Handler
+        btnControlScreen.addEventListener('click', async () => {
+            if (!isSharingScreen) {
+                try {
+                    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                    const screenTrack = screenStream.getVideoTracks()[0];
+
+                    // Replace video tracks in peer connections
+                    Object.values(peerConnections).forEach(pc => {
+                        const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                        if (sender) sender.replaceTrack(screenTrack);
+                    });
+
+                    isSharingScreen = true;
+                    if (participants[myUserId]) {
+                        participants[myUserId].isScreenShare = true;
+                        participants[myUserId].isCamOff = false;
+                    }
+
+                    btnControlScreen.classList.add('bg-brand-600', 'text-white');
+                    screenTrack.onended = () => stopScreenSharing();
+
+                    broadcastPresence();
+                    renderVideoGrid();
+                    showToast('Compartilhamento de tela iniciado.', 'success');
+                } catch (e) {
+                    console.warn('Compartilhamento cancelado:', e);
+                }
+            } else {
+                stopScreenSharing();
+            }
+        });
+
+        function stopScreenSharing() {
+            if (!isSharingScreen) return;
+            if (screenStream) {
+                screenStream.getTracks().forEach(t => t.stop());
+            }
+
+            const videoTrack = localStream ? localStream.getVideoTracks()[0] : null;
+            Object.values(peerConnections).forEach(pc => {
+                const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                if (sender && videoTrack) sender.replaceTrack(videoTrack);
+            });
+
+            isSharingScreen = false;
+            if (participants[myUserId]) {
+                participants[myUserId].isScreenShare = false;
+                participants[myUserId].isCamOff = isCamOff;
+            }
+
+            btnControlScreen.classList.remove('bg-brand-600', 'text-white');
+            broadcastPresence();
+            renderVideoGrid();
+            showToast('Compartilhamento de tela encerrado.');
+        }
+
+        function updateMediaControlsUI() {
+            btnControlMic.classList.toggle('bg-red-600/20', isMicMuted);
+            btnControlMic.classList.toggle('text-red-500', isMicMuted);
+            document.getElementById('icon-mic').setAttribute('data-lucide', isMicMuted ? 'mic-off' : 'mic');
+
+            btnControlCam.classList.toggle('bg-red-600/20', isCamOff);
+            btnControlCam.classList.toggle('text-red-500', isCamOff);
+            document.getElementById('icon-cam').setAttribute('data-lucide', isCamOff ? 'video-off' : 'video');
+
+            document.getElementById('quick-mic-icon').setAttribute('data-lucide', isMicMuted ? 'mic-off' : 'mic');
+            document.getElementById('quick-cam-icon').setAttribute('data-lucide', isCamOff ? 'video-off' : 'video');
+
+            lucide.createIcons();
+        }
+
+        // Leave Call / Disconnect Button
+        btnControlDisconnect.addEventListener('click', () => {
+            signalingChannel.postMessage({ type: 'leave', userId: myUserId });
+            Object.keys(peerConnections).forEach(id => closePeerConnection(id));
+            
+            showToast('Você saiu do canal de voz.', 'error');
+            setTimeout(() => location.reload(), 800);
+        });
+
+        // Simulated Bot Participants Feature for Testing Grid Layouts
+        btnAddSimulatedUser.addEventListener('click', () => {
+            const botId = 'bot_' + Math.random().toString(36).substring(2, 6);
+            const botNames = ['Alex_Gamer', 'Carol_Dev', 'Marcos_QA', 'Beatriz_PM', 'Lucas_Design'];
+            const randomName = botNames[Math.floor(Math.random() * botNames.length)] + ' (Bot)';
+
+            participants[botId] = {
+                id: botId,
+                name: randomName,
+                channelId: activeChannelId,
+                isMuted: Math.random() > 0.5,
+                isCamOff: Math.random() > 0.6,
+                isScreenShare: false,
+                isSimulated: true,
+                stream: null
+            };
+
+            renderChannelsSidebar();
+            renderVideoGrid();
+            showToast(`${randomName} entrou no canal.`, 'success');
+        });
+
+        // Chat Panel Handlers
+        btnToggleTextChat.addEventListener('click', () => {
+            isChatOpen = !isChatOpen;
+            textChatPanel.classList.toggle('hidden', !isChatOpen);
+            if (isChatOpen) chatUnreadBadge.classList.add('hidden');
+        });
+
+        btnCloseChatPanel.addEventListener('click', () => {
+            isChatOpen = false;
+            textChatPanel.classList.add('hidden');
+        });
+
+        chatInputForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInputField.value.trim();
+            if (!text) return;
+
+            appendChatMessage('Você', text, 'local');
+            chatInputField.value = '';
+
+            signalingChannel.postMessage({
+                type: 'chat',
+                userId: myUserId,
+                userName: myUserName,
+                channelId: activeChannelId,
+                message: text
+            });
+        });
+
+        function appendChatMessage(sender, text, type) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex flex-col ${type === 'local' ? 'items-end' : 'items-start'}`;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            msgDiv.innerHTML = `
+                <span class="text-[10px] text-gray-500 mb-0.5 px-1">${sender} • ${time}</span>
+                <div class="max-w-[85%] px-3 py-1.5 rounded-2xl text-xs ${
+                    type === 'local' 
+                        ? 'bg-brand-600 text-white rounded-br-none shadow-md' 
+                        : 'bg-dark-hover border border-dark-border text-gray-200 rounded-bl-none'
+                }">
+                    ${escapeHtml(text)}
+                </div>
+            `;
+
+            chatMessagesContainer.appendChild(msgDiv);
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            })[m]);
+        }
+
+        // App Initialization
+        window.onload = () => {
+            setupLocalMedia();
+        };
+
+        // Clean up on window close
+        window.onbeforeunload = () => {
+            signalingChannel.postMessage({ type: 'leave', userId: myUserId });
+        };
+    </script>
+</body>
+</html>
